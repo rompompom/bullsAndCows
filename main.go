@@ -1,83 +1,139 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 )
 
-const maxValue int = 9999
-const minValue uint = 1000
-
 func main() {
-	const figureDeletedFromSearch uint = 10
-
+	var computerValues [4]uint = generateValue()
+	fmt.Println(computerValues)
 	var gameOver bool = false
-	var userInput uint
-	var value uint = generateValue()
+	in := bufio.NewReader(os.Stdin)
 
 	for !gameOver {
+		var bulls uint = 0
+		var cows uint = 0
 		fmt.Println("Введите число из четырех цифр:")
-		fmt.Scan(&userInput)
 
-		if userInput > uint(maxValue) {
-			fmt.Println("Число слишком большое!")
-		} else if userInput < minValue {
-			fmt.Println("Число слишком маленькое!")
+		userInput, err := in.ReadString('\n')
+		if err != nil {
+			fmt.Println("Ошибка ввода: ", err)
+		}
+
+		if len(userInput) != 6 {
+			fmt.Println("Ошибка! Значение должно содержать 4 цифры")
 		} else {
-			if userInput == value {
-				fmt.Println("Победа! Вы угадали число.")
-				gameOver = true
+			userValues, err := getFigures(userInput)
+			if err != nil {
+				fmt.Println("Введено некорректное значение. (Нужно ввести четыре неповторяющиеся цифры)")
+			} else if !isValuesUnic(userValues) {
+				fmt.Println("Числа не должны повторяться")
 			} else {
-				var userFigures [4]uint = getFigures(userInput)
-				var computerFigures [4]uint = getFigures(value)
-
-				var bulls uint = 0
-				var cows uint = 0
-
-				for i := 0; i < len(userFigures); i++ {
-					if userFigures[i] == computerFigures[i] {
-						bulls++
-						userFigures[i] = figureDeletedFromSearch
-						computerFigures[i] = figureDeletedFromSearch
-					}
-				}
-
-				for i := 0; i < len(userFigures); i++ {
-					for j := 0; j < len(userFigures); j++ {
-						if (userFigures[j] != figureDeletedFromSearch) && (computerFigures[i] != figureDeletedFromSearch) {
-							if userFigures[j] == computerFigures[i] {
+				for i := 0; i < 4; i++ {
+					for j := 0; j < 4; j++ {
+						if computerValues[i] == userValues[j] {
+							if i == j {
+								bulls++
+							} else {
 								cows++
-								userFigures[j] = figureDeletedFromSearch
-								computerFigures[i] = figureDeletedFromSearch
 							}
 						}
-
 					}
 				}
-
-				fmt.Println("Не угадали. Быки:", bulls, "Коровы:", cows)
+				if bulls == 4 {
+					fmt.Println("Победа!")
+					gameOver = true
+				} else {
+					fmt.Println("Не угадали. Быки:", bulls, "Коровы:", cows)
+				}
 			}
 		}
 	}
 
-	fmt.Scan(&userInput)
+	var temp string
+	fmt.Scan(&temp)
 }
 
-func getFigures(value uint) [4]uint {
+//Generates array with four unic value in range 0...9
+func generateValue() [4]uint {
 	var result [4]uint
-	result[0] = value / 1000
-	result[1] = (value % 1000) / 100
-	result[2] = (value % 100) / 10
-	result[3] = value % 10
+	rand.Seed(time.Now().Unix())
+	result[0] = uint(rand.Intn(10))
+
+	for i := 1; i < len(result); i++ {
+		var newValue uint = uint(rand.Intn(10))
+		var checkValueIsUnic bool = true
+		for checkValueIsUnic {
+			checkValueIsUnic = false
+			for j := 0; j < i; j++ {
+				if newValue == result[j] {
+					newValue++
+					if newValue > 9 {
+						newValue = 0
+					}
+					checkValueIsUnic = true
+					break
+				}
+			}
+		}
+		result[i] = newValue
+	}
+
 	return result
 }
 
-func generateValue() uint {
-	rand.Seed(time.Now().Unix())
-	var value uint = uint(rand.Intn(maxValue))
-	if value < minValue {
-		value += minValue
+//Converts symbols from str to digits array
+//Returns error if str contains symbols that not digits
+func getFigures(str string) ([4]uint, error) {
+	var result [4]uint
+	var err error = nil
+
+	for i := 0; i < len(result); i++ {
+		result[i], err = getFigure(str[i])
+		if err != nil {
+			break
+		}
 	}
-	return value
+
+	return result, err
+}
+
+//Converts ASCII code to digit
+//If code isn't digit code returns error
+func getFigure(symbol byte) (uint, error) {
+	const asciiCode0 byte = 0x30
+	var result uint = 0
+	var err error = nil
+
+	if (symbol >= asciiCode0) && (symbol <= 0x39) {
+		result = uint(symbol - 0x30)
+	} else {
+		err = errors.New("symbol is incorrect")
+	}
+	return result, err
+}
+
+//Retturns true if all values in array is unic
+//otherwise returns false
+func isValuesUnic(values [4]uint) bool {
+	var result bool = true
+	for i := 0; i < len(values); i++ {
+		var identicalValues uint = 0
+		for j := 0; j < len(values); j++ {
+			if values[i] == values[j] {
+				identicalValues++
+			}
+
+			if identicalValues > 1 {
+				result = false
+				break
+			}
+		}
+	}
+	return result
 }
