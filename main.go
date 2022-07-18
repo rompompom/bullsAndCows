@@ -9,9 +9,10 @@ import (
 	"time"
 )
 
+const numberOfDigits int = 4
+
 func main() {
-	var computerValues [4]uint = generateValue()
-	fmt.Println(computerValues)
+	var computerValues [numberOfDigits]uint = generateValue()
 	var gameOver bool = false
 	in := bufio.NewReader(os.Stdin)
 
@@ -34,8 +35,8 @@ func main() {
 			} else if !isValuesUnic(userValues) {
 				fmt.Println("Числа не должны повторяться")
 			} else {
-				for i := 0; i < 4; i++ {
-					for j := 0; j < 4; j++ {
+				for i := 0; i < numberOfDigits; i++ {
+					for j := 0; j < numberOfDigits; j++ {
 						if computerValues[i] == userValues[j] {
 							if i == j {
 								bulls++
@@ -60,12 +61,12 @@ func main() {
 }
 
 //Generates array with four unic value in range 0...9
-func generateValue() [4]uint {
-	var result [4]uint
+func generateValue() [numberOfDigits]uint {
+	var result [numberOfDigits]uint
 	rand.Seed(time.Now().Unix())
 	result[0] = uint(rand.Intn(10))
 
-	for i := 1; i < len(result); i++ {
+	for i := 1; i < numberOfDigits; i++ {
 		var newValue uint = uint(rand.Intn(10))
 		var checkValueIsUnic bool = true
 		for checkValueIsUnic {
@@ -89,11 +90,11 @@ func generateValue() [4]uint {
 
 //Converts symbols from str to digits array
 //Returns error if str contains symbols that not digits
-func getFigures(str string) ([4]uint, error) {
-	var result [4]uint
+func getFigures(str string) ([numberOfDigits]uint, error) {
+	var result [numberOfDigits]uint
 	var err error = nil
 
-	for i := 0; i < len(result); i++ {
+	for i := 0; i < numberOfDigits; i++ {
 		result[i], err = getFigure(str[i])
 		if err != nil {
 			break
@@ -120,11 +121,11 @@ func getFigure(symbol byte) (uint, error) {
 
 //Retturns true if all values in array is unic
 //otherwise returns false
-func isValuesUnic(values [4]uint) bool {
+func isValuesUnic(values [numberOfDigits]uint) bool {
 	var result bool = true
-	for i := 0; i < len(values); i++ {
+	for i := 0; i < numberOfDigits; i++ {
 		var identicalValues uint = 0
-		for j := 0; j < len(values); j++ {
+		for j := 0; j < numberOfDigits; j++ {
 			if values[i] == values[j] {
 				identicalValues++
 			}
