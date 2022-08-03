@@ -12,9 +12,11 @@ import (
 const numberOfDigits int = 4
 
 func main() {
+	in := bufio.NewReader(os.Stdin)
+
 	var computerValues [numberOfDigits]uint = generateValue()
 	var gameOver bool = false
-	in := bufio.NewReader(os.Stdin)
+	var attempts uint = 0
 
 	for !gameOver {
 		var bulls uint = 0
@@ -46,8 +48,12 @@ func main() {
 						}
 					}
 				}
-				if bulls == 4 {
+
+				attempts++
+
+				if bulls == uint(numberOfDigits) {
 					fmt.Println("Победа!")
+					fmt.Println("Число угадано за", attempts, "попыток")
 					gameOver = true
 				} else {
 					fmt.Println("Не угадали. Быки:", bulls, "Коровы:", cows)
@@ -60,7 +66,7 @@ func main() {
 	fmt.Scan(&temp)
 }
 
-//Generates array with four unic value in range 0...9
+//Generates array with four unic values in range 0...9
 func generateValue() [numberOfDigits]uint {
 	var result [numberOfDigits]uint
 	rand.Seed(time.Now().Unix())
@@ -108,18 +114,19 @@ func getFigures(str string) ([numberOfDigits]uint, error) {
 //If code isn't digit code returns error
 func getFigure(symbol byte) (uint, error) {
 	const asciiCode0 byte = 0x30
+	const asciiCode9 byte = 0x39
 	var result uint = 0
 	var err error = nil
 
-	if (symbol >= asciiCode0) && (symbol <= 0x39) {
-		result = uint(symbol - 0x30)
+	if (symbol >= asciiCode0) && (symbol <= asciiCode9) {
+		result = uint(symbol - asciiCode0)
 	} else {
 		err = errors.New("symbol is incorrect")
 	}
 	return result, err
 }
 
-//Retturns true if all values in array is unic
+//Retturns true if all values in array are unic
 //otherwise returns false
 func isValuesUnic(values [numberOfDigits]uint) bool {
 	var result bool = true
