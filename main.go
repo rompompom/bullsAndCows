@@ -35,7 +35,7 @@ func main() {
 			if err != nil {
 				fmt.Println("Введено некорректное значение. (Нужно ввести четыре неповторяющиеся цифры)")
 			} else if !isValuesUnic(userValues) {
-				fmt.Println("Числа не должны повторяться")
+				fmt.Println("Цифры не должны повторяться")
 			} else {
 				for i := 0; i < numberOfDigits; i++ {
 					for j := 0; j < numberOfDigits; j++ {
@@ -66,7 +66,7 @@ func main() {
 	fmt.Scan(&temp)
 }
 
-//Generates array with four unic values in range 0...9
+// Generates array with four unic values in range 0...9
 func generateValue() [numberOfDigits]uint {
 	var result [numberOfDigits]uint
 	rand.Seed(time.Now().Unix())
@@ -94,8 +94,8 @@ func generateValue() [numberOfDigits]uint {
 	return result
 }
 
-//Converts symbols from str to digits array
-//Returns error if str contains symbols that not digits
+// Converts symbols from str to digits array
+// Returns error if str contains symbols that not digits
 func getFigures(str string) ([numberOfDigits]uint, error) {
 	var result [numberOfDigits]uint
 	var err error = nil
@@ -110,8 +110,8 @@ func getFigures(str string) ([numberOfDigits]uint, error) {
 	return result, err
 }
 
-//Converts ASCII code to digit
-//If code isn't digit code returns error
+// Converts ASCII code to digit
+// If code isn't digit code returns error
 func getFigure(symbol byte) (uint, error) {
 	const asciiCode0 byte = 0x30
 	const asciiCode9 byte = 0x39
@@ -126,8 +126,8 @@ func getFigure(symbol byte) (uint, error) {
 	return result, err
 }
 
-//Retturns true if all values in array are unic
-//otherwise returns false
+// Retturns true if all values in array are unic
+// otherwise returns false
 func isValuesUnic(values [numberOfDigits]uint) bool {
 	var result bool = true
 	for i := 0; i < numberOfDigits; i++ {
